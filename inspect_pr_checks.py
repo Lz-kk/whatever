@@ -8,9 +8,9 @@ Requires:
   - current directory inside a Git repository (or --repo flag)
 
 Exit codes:
-  0  — no failing checks detected  (or all failures are log-pending)
-  1  — confirmed failing checks with actionable logs
-  2  — internal error (GitHub CLI, repo, or unexpected response)
+  0   --  no failing checks detected  (or all failures are log-pending)
+  1   --  confirmed failing checks with actionable logs
+  2   --  internal error (GitHub CLI, repo, or unexpected response)
 """
 
 from __future__ import annotations
@@ -88,7 +88,7 @@ def run_gh_command(
 
     When *text* is False the stdout field will be the raw bytes decoded
     with ``errors="replace"``; callers needing binary output should pass
-    ``text=False`` and then access ``.stdout_bytes`` (not yet present —
+    ``text=False`` and then access ``.stdout_bytes`` (not yet present  -- 
     in that case the stdout is stored as a string via replace-decoding).
     """
     process = subprocess.run(
@@ -246,8 +246,10 @@ def resolve_pr(pr_value: str | None, repo_root: Path) -> str | None:
             file=sys.stderr,
         )
         return None
-    data = _gh_json(["pr", "view", "--json", "number"], repo_root, label="pr view")
-    if data is None:
+    try:
+        data = json.loads(result.stdout or "{}")
+    except json.JSONDecodeError:
+        print("Error: unable to parse PR JSON.", file=sys.stderr)
         return None
     number = data.get("number")
     if not number:
@@ -355,7 +357,7 @@ def analyze_check(
         base["note"] = "No GitHub Actions run id detected in detailsUrl."
         return base
 
-    # Fetch logs first — if they aren't available we skip the metadata call
+    # Fetch logs first  --  if they aren't available we skip the metadata call
     log_text, log_error, log_status = fetch_check_log(
         run_id=run_id,
         job_id=job_id,
@@ -585,7 +587,7 @@ def render_results(pr_number: str, results: Iterable[dict[str, Any]]) -> None:
     pending = sum(1 for r in results_list if r.get("status") == "log_pending")
     unavailable = sum(1 for r in results_list if r.get("status") in ("log_unavailable", "external"))
 
-    print(f"PR #{pr_number}: {total} failing check(s) — {actionable} analyzed, {pending} pending, {unavailable} unavailable.")
+    print(f"PR #{pr_number}: {total} failing check(s)  --  {actionable} analyzed, {pending} pending, {unavailable} unavailable.")
 
     for result in results_list:
         print("-" * 60)

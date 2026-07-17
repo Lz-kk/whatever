@@ -143,7 +143,7 @@ def gh_api_graphql(
         "gh",
         "api",
         "graphql",
-        "-f",
+        "-F",
         "query=@-",
         "-F",
         f"owner={owner}",
