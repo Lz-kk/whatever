@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="病虫害识别">
+  <meta name="description" content="基于深度学习的作物病虫害识别系统">
+  <meta name="theme-color" content="#1a3a2a">
+  <link rel="manifest" href="static/manifest.json">
+  <link rel="apple-touch-icon" href="static/icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="static/css/style.css">
+  <title>病虫害识别</title>
+</head>
+<body>
+
+<div id="app">
+
+  <!-- Header -->
+  <header>
+    <div class="header-icon">
+      <svg viewBox="0 0 40 40" width="28" height="28" fill="none" stroke="#4ade80" stroke-width="2">
+        <path d="M20 6 C20 6 12 16 12 24 C12 30 16 34 20 34 C24 34 28 30 28 24 C28 16 20 6 20 6Z"/>
+        <path d="M16 22 L20 26 L26 18" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <h1>病虫害识别</h1>
+    <p class="subtitle">拍照或上传图片，AI 自动识别病虫害</p>
+  </header>
+
+  <!-- Model info bar -->
+  <div class="info-bar" id="infoBar">
+    <span class="info-dot"></span>
+    <span id="modelStatus">加载模型中...</span>
+  </div>
+
+  <!-- Main card -->
+  <main>
+    <div class="preview-area" id="previewArea">
+      <div class="preview-placeholder" id="placeholder">
+        <svg viewBox="0 0 64 64" width="48" height="48" fill="none" stroke="#4ade80" stroke-width="2" stroke-linecap="round">
+          <rect x="8" y="14" width="48" height="36" rx="4"/>
+          <circle cx="26" cy="30" r="6"/>
+          <path d="M8 50 L22 36 L30 44 L38 34 L56 50"/>
+        </svg>
+        <p>选择图片或拍照</p>
+      </div>
+      <img id="previewImage" class="hidden" alt="预览">
+    </div>
+
+    <!-- Action buttons -->
+    <div class="btn-group">
+      <button class="btn btn-camera" id="cameraBtn">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+          <circle cx="12" cy="13" r="4"/>
+        </svg>
+        拍照识别
+      </button>
+      <button class="btn btn-upload" id="uploadBtn">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="17 8 12 3 7 8"/>
+          <line x1="12" y1="3" x2="12" y2="15"/>
+        </svg>
+        上传图片
+      </button>
+    </div>
+
+    <input type="file" id="cameraInput" accept="image/*" capture="environment" class="hidden-input">
+    <input type="file" id="fileInput" accept="image/*" class="hidden-input">
+
+    <!-- Loading -->
+    <div id="loading" class="hidden">
+      <div class="spinner"></div>
+      <p>正在分析图片...</p>
+    </div>
+
+    <!-- Results -->
+    <div id="results" class="hidden">
+      <div class="results-header">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#4ade80" stroke-width="2">
+          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+        </svg>
+        <h2>识别结果</h2>
+      </div>
+
+      <!-- Top match -->
+      <div id="topMatch" class="top-match hidden">
+        <div class="match-label">最可能病虫害</div>
+        <div class="match-name" id="topName"></div>
+        <div class="match-prob" id="topProb"></div>
+      </div>
+
+      <!-- All results bars -->
+      <div class="results-list" id="resultsList"></div>
+
+      <div class="disclaimer">
+        识别结果仅供参考，建议咨询农业专家确认
+      </div>
+    </div>
+
+    <!-- Error -->
+    <div id="error" class="hidden error-box">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#f87171" stroke-width="2">
+        <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/>
+        <line x1="9" y1="9" x2="15" y2="15"/>
+      </svg>
+      <span id="errorMsg"></span>
+    </div>
+
+    <!-- Debug log (hidden by default) -->
+    <div id="debugLog" class="debug-log hidden">
+      <div class="debug-toggle" onclick="this.parentElement.querySelector('.debug-content').classList.toggle('hidden')">
+        调试日志 ▾
+      </div>
+      <pre class="debug-content hidden" id="debugContent"></pre>
+    </div>
+  </main>
+
+</div>
+
+<script src="static/js/app.js"></script>
+<script>
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("static/sw.js").catch(function (e) {
+    console.warn("SW registration failed:", e);
+  });
+}
+</script>
+</body>
+</html>

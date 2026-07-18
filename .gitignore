@@ -1,0 +1,9 @@
+__pycache__/
+uploaded/
+*.pyc
+server.log
+*.log
+test_api.py
+test_live.py
+icons.py
+.DS_Store
